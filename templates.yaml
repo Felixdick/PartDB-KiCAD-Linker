@@ -1,0 +1,245 @@
+# Replace the category name below with the exact name from your Part-DB.
+"Thick Film Resistors": # <-- RENAME THIS
+  field_mapping:
+    "Reference": "'R?'" # <-- EDIT THIS AS NEEDED
+    "Value": "value"
+    "Footprint": "footprint.name"
+    "Datasheet": "manufacturer_product_url"
+    # Add other direct mappings here if needed
+
+  symbol_options: '(pin_numbers (hide yes) ) (pin_names (offset 0) ) (exclude_from_sim no)'
+
+  property_templates:
+    "Reference": '(property "Reference" "{VALUE}" (at 1.778 2.032 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Value": '(property "Value" "{VALUE}" (at 1.778 0.254 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Footprint": '(property "Footprint" "{VALUE}" (at -1.778 0 90) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Datasheet": '(property "Datasheet" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Description": '(property "Description" "{VALUE}" (at -0.508 -7.62 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Resistance": '(property "Resistance" "{VALUE}" (at 7.112 -7.874 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Tolerance": '(property "Tolerance" "{VALUE}" (at 1.778 -1.524 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Power Dissipation": '(property "Power Dissipation" "{VALUE}" (at 1.778 -3.302 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Manufacturer": '(property "Manufacturer" "{VALUE}" (at -1.016 -7.62 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Manufacturer Partnumber": '(property "Manufacturer Partnumber" "{VALUE}" (at 0.762 -7.62 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Comment": '(property "Comment" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Temperature Range": '(property "Temperature Range" "{VALUE}" (at 0.254 -7.62 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Weight": '(property "Weight" "{VALUE}" (at -0.508 -8.128 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Temperature Coefficient": '(property "Temperature Coefficient" "{VALUE}" (at 2.286 -7.366 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Compliance": '(property "Compliance" "{VALUE}" (at -1.016 -7.366 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "ki_keywords": '(property "ki_keywords" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "ki_fp_filters": '(property "ki_fp_filters" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+
+  symbol_template: |
+    (symbol "ThickFilmResistor_0_1"
+      (rectangle
+      (start -1.016 2.54)
+      (end 1.016 -2.54)
+      (stroke
+      (width 0.254)
+      (type default)
+      )
+      (fill
+      (type none)
+      )
+      )
+      )
+    (symbol "ThickFilmResistor_1_1"
+      (pin passive line
+      (at 0 3.81 270)
+      (length 1.27)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "1"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+      (pin passive line
+      (at 0 -3.81 90)
+      (length 1.27)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "2"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+      )
+    (pin passive line
+      (at 0 3.81 270)
+      (length 1.27)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "1"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+    (pin passive line
+      (at 0 -3.81 90)
+      (length 1.27)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "2"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+
+
+
+
+# Replace the category name below with the exact name from your Part-DB.
+"MLCCs": # <-- RENAME THIS
+  field_mapping:
+    "Reference": "'C?'" # <-- EDIT THIS AS NEEDED
+    "Value": "value"
+    "Footprint": "footprint.name"
+    "Datasheet": "manufacturer_product_url"
+    # Add other direct mappings here if needed
+
+  symbol_options: '(pin_numbers (hide yes) ) (pin_names (offset 0.254) ) (exclude_from_sim no)'
+
+  property_templates:
+    "Reference": '(property "Reference" "{VALUE}" (at 2.794 2.032 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Value": '(property "Value" "{VALUE}" (at 2.794 0.254 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Footprint": '(property "Footprint" "{VALUE}" (at 0.9652 -3.81 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Datasheet": '(property "Datasheet" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Description": '(property "Description" "{VALUE}" (at 0 -8.382 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "Tolerance": '(property "Tolerance" "{VALUE}" (at 2.794 -3.302 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "Voltage": '(property "Voltage" "{VALUE}" (at 2.794 -1.524 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )'
+    "ki_keywords": '(property "ki_keywords" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+    "ki_fp_filters": '(property "ki_fp_filters" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )'
+
+  symbol_template: |
+    (symbol "MLCCs_0_1"
+      (polyline
+      (pts
+      (xy -2.032 0.762) (xy 2.032 0.762)
+      )
+      (stroke
+      (width 0.508)
+      (type default)
+      )
+      (fill
+      (type none)
+      )
+      )
+      (polyline
+      (pts
+      (xy -2.032 -0.762) (xy 2.032 -0.762)
+      )
+      (stroke
+      (width 0.508)
+      (type default)
+      )
+      (fill
+      (type none)
+      )
+      )
+      )
+    (symbol "MLCCs_1_1"
+      (pin passive line
+      (at 0 3.81 270)
+      (length 2.794)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "1"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+      (pin passive line
+      (at 0 -3.81 90)
+      (length 2.794)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "2"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+      )
+    (pin passive line
+      (at 0 3.81 270)
+      (length 2.794)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "1"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
+    (pin passive line
+      (at 0 -3.81 90)
+      (length 2.794)
+      (name "~"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      (number "2"
+      (effects
+      (font
+      (size 1.27 1.27)
+      )
+      )
+      )
+      )
