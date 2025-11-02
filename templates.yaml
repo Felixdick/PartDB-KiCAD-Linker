@@ -1,11 +1,18 @@
-# Replace the category name below with the exact name from your Part-DB.
-"Thick Film Resistors": # <-- RENAME THIS
+# ===================================================================
+# --- TEMPLATE 1: Static Resistor ---
+# ===================================================================
+Static_Resistor_Template:
+  # This template will be used for any Part-DB category that
+  # ends with "Thick Film Resistors".
+  applies_to_categories:
+    - "Thick Film Resistors"
+    # - "Metal Film Resistors" # You could add more here
+
   field_mapping:
-    "Reference": "'R?'" # <-- EDIT THIS AS NEEDED
+    "Reference": "'R?'"
     "Value": "value"
     "Footprint": "footprint.name"
     "Datasheet": "manufacturer_product_url"
-    # Add other direct mappings here if needed
 
   symbol_options: '(pin_numbers (hide yes) ) (pin_names (offset 0) ) (exclude_from_sim no)'
 
@@ -80,54 +87,19 @@
       )
       )
       )
-    (pin passive line
-      (at 0 3.81 270)
-      (length 1.27)
-      (name "~"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      (number "1"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      )
-    (pin passive line
-      (at 0 -3.81 90)
-      (length 1.27)
-      (name "~"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      (number "2"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      )
 
+# ===================================================================
+# --- TEMPLATE 2: Static Capacitor ---
+# ===================================================================
+Static_Capacitor_Template:
+  applies_to_categories:
+    - "MLCCs"
 
-
-
-# Replace the category name below with the exact name from your Part-DB.
-"MLCCs": # <-- RENAME THIS
   field_mapping:
-    "Reference": "'C?'" # <-- EDIT THIS AS NEEDED
+    "Reference": "'C?'"
     "Value": "value"
     "Footprint": "footprint.name"
     "Datasheet": "manufacturer_product_url"
-    # Add other direct mappings here if needed
 
   symbol_options: '(pin_numbers (hide yes) ) (pin_names (offset 0.254) ) (exclude_from_sim no)'
 
@@ -207,39 +179,60 @@
       )
       )
       )
-    (pin passive line
-      (at 0 3.81 270)
-      (length 2.794)
-      (name "~"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      (number "1"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      )
-    (pin passive line
-      (at 0 -3.81 90)
-      (length 2.794)
-      (name "~"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      (number "2"
-      (effects
-      (font
-      (size 1.27 1.27)
-      )
-      )
-      )
-      )
+
+# ===================================================================
+# --- TEMPLATE 3: Dynamic IC / Multi-Category Template (FIXED) ---
+# ===================================================================
+Dynamic_IC_Box_Generator:
+
+  # This ONE template will apply to ALL categories listed here
+  applies_to_categories:
+    - "Integrated Circuits"
+    - "Optocouplers"
+    - "Logic Gates"
+    # Add any other category from Part-DB you want to use this for
+
+  field_mapping:
+    "Reference": "'U?'"
+    "Value": "value"
+    "Footprint": "footprint.name"
+    "Datasheet": "manufacturer_product_url"
+
+  symbol_options: '(pin_numbers) (pin_names (offset 0.508)) (exclude_from_sim no)'
+
+  property_templates:
+    # --- Standard fields (FIXED justify) ---
+    # KiCad syntax is (justify horizontal vertical)
+    "Reference": '(property "Reference" "{VALUE}" (at 0 3.81 0) (effects (font (size 1.27 1.27)) (justify right) ) )'
+    "Value": '(property "Value" "{VALUE}" (at 0 -3.81 0) (effects (font (size 1.27 1.27)) (justify right) ) )'
+    "Footprint": '(property "Footprint" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Datasheet": '(property "Datasheet" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    
+    # --- The most important field for this generator ---
+    "Pin Description": '(property "Pin Description" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    
+    # --- Other common IC fields (add any you use) ---
+    "Manufacturer": '(property "Manufacturer" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Manufacturer Partnumber": '(property "Manufacturer Partnumber" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "ki_keywords": '(property "ki_keywords" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "ki_fp_filters": '(property "ki_fp_filters" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+
+  # --- Generator configuration ---
+  
+  # Use the dynamic box generator instead of a static template
+  symbol_generator: "IC_Box"
+  
+  # List of pin names (case-insensitive) to move to Part B
+  power_pin_names: 
+    - "VCC"
+    - "VDD"
+    - "VSS"
+    - "GND"
+    - "VEE"
+    - "VIN"
+    - "V+"
+    - "V-"
+    - "AVDD"
+    - "AGND"
+    - "DVDD"
+    - "DGND"
