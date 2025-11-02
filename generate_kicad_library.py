@@ -73,11 +73,11 @@ def get_value_from_part(part: Part, key_path: str):
     return str(val)
 
 
-def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, power_names_upper: list, is_multi_unit: bool) -> (str, str):
+def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, power_names_upper: list, is_multi_unit: bool) -> (str, str, dict):
     """
     Generates the KiCad graphics and pin text for a single unit (Part A, B, etc.).
     
-    Returns a tuple of (graphics_string, pins_string)
+    Returns a tuple of (graphics_string, pins_string, geometry_dict)
     
     Args:
         symbol_name_prefix: The base name (e.g., "My_IC")
@@ -93,7 +93,9 @@ def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, 
     # Standard KiCad grid sizes
     GRID_SPACING = 2.54  # 100mil
     PIN_LENGTH = 2.54
-    BOX_WIDTH = 7.62     # 300mil
+    
+    # --- *** MODIFIED LINE *** ---
+    BOX_WIDTH = 15.24    # 600mil (was 7.62)
     
     total_pins = len(pins_list)
     left_pin_count = math.ceil(total_pins / 2.0)
@@ -113,6 +115,12 @@ def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, 
     bottom = -top
     left = -BOX_WIDTH / 2.0
     right = BOX_WIDTH / 2.0
+    
+    # **NEW**: Store geometry to return
+    geometry = {
+        'box_top': top,
+        'box_left': left
+    }
     
     # Coordinates for pins
     pin_x_left = -BOX_WIDTH / 2.0 - PIN_LENGTH
@@ -161,26 +169,22 @@ def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, 
     
     pin_lines.append('    )') # Close (symbol ... _1_X)
         
-    return ('\n'.join(graphics_lines), '\n'.join(pin_lines))
+    return ('\n'.join(graphics_lines), '\n'.join(pin_lines), geometry)
 
 
-def _generate_dynamic_ic_units(symbol_name: str, pin_csv: str, power_names: list) -> (str, str, bool):
+def _generate_dynamic_ic_units(symbol_name: str, pin_csv: str, power_names: list) -> (str, str, bool, dict):
     """
     Parses a pin CSV and generates KiCad unit blocks for main and power pins.
-    Returns a tuple: (all_graphics_blocks, all_pin_blocks, has_part_b_boolean)
+    Returns a tuple: (all_graphics_blocks, all_pin_blocks, has_part_b_boolean, unit_1_geometry_dict)
     """
-    if not pin_csv:
-        # No pins, generate a box with a warning
-        graphics_block = (
-            f'    (symbol "{symbol_name}_0_1" (unit 1)\n'
-            f'      (rectangle (start -5.08 2.54) (end 5.08 -2.54) (stroke (width 0.254) (type default)) (fill (type background)))\n'
-            f'      (text "No \'Pin Description\'" (at 0 0 0) (effects (font (size 1.27 1.27))))\n'
-            f'    )\n'
-            # Add an empty pin block
-            f'    (symbol "{symbol_name}_1_1" (unit 1))\n'
-        )
-        return (graphics_block, "", False)
-
+    
+    # --- *** BUG FIX *** ---
+    # The problematic 'if not pin_csv:' block was removed.
+    # The logic below is robust and handles an empty pin_csv
+    # (which results in main_pins = [] and power_pins = [])
+    # correctly, flowing into the "if not pins_for_part_a..."
+    # block as intended.
+    
     # 1. Prepare lists
     main_pins = []
     power_pins = []
@@ -216,27 +220,30 @@ def _generate_dynamic_ic_units(symbol_name: str, pin_csv: str, power_names: list
     # 4. Build the final string
     all_graphics_strings = []
     all_pin_strings = []
+    
+    # **NEW**: Store geometry for unit 1
+    geo_a = {}
 
     # 5. Generate Part A (Main Pins or All Pins)
     if not pins_for_part_a and not pins_for_part_b:
-         # This should only happen if pin_csv was empty, which is handled above,
-         # but as a fallback, create an empty part A.
-         graphics_a, pins_a = _build_one_unit(symbol_name, 1, [], power_names_upper, has_part_b)
+         # This block will now be correctly entered if pin_csv was empty
+         graphics_a, pins_a, geo_a = _build_one_unit(symbol_name, 1, [], power_names_upper, has_part_b)
          all_graphics_strings.append(graphics_a)
          all_pin_strings.append(pins_a)
     else:
-        graphics_a, pins_a = _build_one_unit(symbol_name, 1, pins_for_part_a, power_names_upper, has_part_b)
+        graphics_a, pins_a, geo_a = _build_one_unit(symbol_name, 1, pins_for_part_a, power_names_upper, has_part_b)
         all_graphics_strings.append(graphics_a)
         all_pin_strings.append(pins_a)
 
     # 6. Generate Part B (Power Pins) - ONLY if it makes sense
     if has_part_b:
-        graphics_b, pins_b = _build_one_unit(symbol_name, 2, pins_for_part_b, power_names_upper, has_part_b)
+        # We don't need the geometry for part B
+        graphics_b, pins_b, _ = _build_one_unit(symbol_name, 2, pins_for_part_b, power_names_upper, has_part_b)
         all_graphics_strings.append(graphics_b)
         all_pin_strings.append(pins_b)
 
-    # 7. Return the combined string and the flag
-    return ('\n'.join(all_graphics_strings), '\n'.join(all_pin_strings), has_part_b)
+    # 7. Return the combined string, the flag, and Unit 1's geometry
+    return ('\n'.join(all_graphics_strings), '\n'.join(all_pin_strings), has_part_b, geo_a)
 
 
 def generate_symbol(part: Part, template: dict) -> str:
@@ -281,11 +288,29 @@ def generate_symbol(part: Part, template: dict) -> str:
         pin_csv_string = get_value_from_part(part, "Pin Description")
         
         # 3. Generate the KiCad text for all units (A, B, etc.)
-        (dynamic_graphics_str, dynamic_pins_str, has_part_b) = _generate_dynamic_ic_units(
+        (dynamic_graphics_str, dynamic_pins_str, has_part_b, unit_1_geo) = _generate_dynamic_ic_units(
             symbol_name,
             pin_csv_string,
             power_names_list
         )
+        
+        # --- *** NEW DYNAMIC POSITIONS *** ---
+        box_left = unit_1_geo.get('box_left', 0)
+        box_top = unit_1_geo.get('box_top', 3.81)
+        box_bottom = -box_top # The Y-coordinate of the bottom edge
+
+        # Reference: 50mil down from 100mil above top-left
+        ref_x = box_left
+        ref_y = box_top + 1.27  # (box_top + 2.54) - 1.27
+
+        # Manufacturer Partnumber: 50mil below bottom-left
+        mpn_x = box_left
+        mpn_y = box_bottom - 1.27 
+        
+        # Description: 100mil below Manufacturer Partnumber (150mil total below bottom-left)
+        desc_x = box_left
+        desc_y = mpn_y - 2.54 # 100mil (2.54mm) below mpn_y
+        
         
         # 4. Get base symbol options
         symbol_options = template.get("symbol_options", "")
@@ -301,15 +326,42 @@ def generate_symbol(part: Part, template: dict) -> str:
         
         # 7. Generate property strings using templates
         for prop_name, prop_value in all_properties.items():
-            prop_template = template.get('property_templates', {}).get(prop_name)
-            if prop_template:
-                # Replace tabs/newlines from YAML multi-line strings
-                clean_template = " ".join(prop_template.split())
-                prop_line = clean_template.replace('{VALUE}', prop_value)
+            
+            # Get the template string for font extraction
+            prop_template_str = template.get('property_templates', {}).get(prop_name, '')
+            
+            # Try to find font size from template, default to 1.27
+            font_size_match = re.search(r'\(size\s+([\d\.]+)\s+([\d\.]+)\)', prop_template_str)
+            font_size_str = f"(size {font_size_match.group(1)} {font_size_match.group(2)})" if font_size_match else "(size 1.27 1.27)"
+
+            
+            if prop_name == "Reference":
+                # --- DYNAMIC PLACEMENT FOR REFERENCE ---
+                prop_line = f'(property "Reference" "{prop_value}" (at {ref_x:.2f} {ref_y:.2f} 0) (effects (font {font_size_str}) (justify left)) )'
                 symbol_lines.append(f'      {prop_line}')
+
+            # --- *** MODIFIED LINE *** ---
+            elif prop_name == "Manufacturer Partnumber":
+                # --- **NEW** DYNAMIC PLACEMENT FOR MPN ---
+                prop_line = f'(property "Manufacturer Partnumber" "{prop_value}" (at {mpn_x:.2f} {mpn_y:.2f} 0) (effects (font {font_size_str}) (justify left)) )'
+                symbol_lines.append(f'      {prop_line}')
+
+            elif prop_name == "Description":
+                # --- DYNAMIC PLACEMENT FOR DESCRIPTION ---
+                prop_line = f'(property "Description" "{prop_value}" (at {desc_x:.2f} {desc_y:.2f} 0) (effects (font {font_size_str}) (justify left)) )'
+                symbol_lines.append(f'      {prop_line}')
+                
             else:
-                # Added the missing final closing parenthesis
-                symbol_lines.append(f'      (property "{prop_name}" "{prop_value}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )')
+                # --- ORIGINAL LOGIC FOR ALL OTHER PROPERTIES (e.g., Value, Footprint) ---
+                prop_template = template.get('property_templates', {}).get(prop_name)
+                if prop_template:
+                    # Replace tabs/newlines from YAML multi-line strings
+                    clean_template = " ".join(prop_template.split())
+                    prop_line = clean_template.replace('{VALUE}', prop_value)
+                    symbol_lines.append(f'      {prop_line}')
+                else:
+                    # Added the missing final closing parenthesis
+                    symbol_lines.append(f'      (property "{prop_name}" "{prop_value}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )')
 
         # 8. Add the generated graphics/pins for all units
         if dynamic_graphics_str:
