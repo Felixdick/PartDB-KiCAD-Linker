@@ -73,73 +73,73 @@ def get_value_from_part(part: Part, key_path: str):
     return str(val)
 
 
-def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, power_names_upper: list, is_multi_unit: bool) -> (str, str, dict):
+def _build_symbol_child_block(symbol_name_prefix: str, unit_number: int, pins_list: list, power_names_upper: list) -> (str, dict):
     """
-    Generates the KiCad graphics and pin text for a single unit (Part A, B, etc.).
+    Generates the KiCad symbol block for a single unit (e.g., ..._1_1 or ..._2_1),
+    combining graphics and pins as required by KiCad 7+.
     
-    Returns a tuple of (graphics_string, pins_string, geometry_dict)
+    Returns a tuple of (unit_block_string, geometry_dict)
     
     Args:
         symbol_name_prefix: The base name (e.g., "My_IC")
         unit_number: The unit number (1 for Part A, 2 for Part B)
         pins_list: A list of tuples, e.g., [("1", "VCC"), ("2", "GND")]
         power_names_upper: A list of uppercase power pin names for setting pin type
-        is_multi_unit: Boolean flag. If True, add (unit X) tags.
     """
-    graphics_lines = []
-    pin_lines = []
+    unit_lines = []
     
     # --- 1. Calculate Geometry ---
-    # Standard KiCad grid sizes
     GRID_SPACING = 2.54  # 100mil
     PIN_LENGTH = 2.54
-    
-    # --- *** MODIFIED LINE *** ---
-    BOX_WIDTH = 15.24    # 600mil (was 7.62)
+    BOX_WIDTH = 15.24    # 600mil
     
     total_pins = len(pins_list)
     left_pin_count = math.ceil(total_pins / 2.0)
     right_pin_count = total_pins // 2
     
-    # Box height is determined by the side with more pins
     box_height_pins = max(left_pin_count, right_pin_count)
-    # Ensure a minimum height for the box
-    min_height_grids = 3
+    
+    # --- *** MODIFIED LOGIC *** ---
+    if unit_number == 1:
+        # Unit A (main block) has a min height of 400mil (3 grid units + padding)
+        min_height_grids = 3
+    else:
+        # Unit B (power block) has a min height of 300mil (2 grid units + padding)
+        min_height_grids = 1
+    # --- *** END MODIFICATION *** ---
+    
     # Calculate height based on pins, ensuring it's at least min_height
-    # Add 1 grid spacing for padding if there are pins
+    # (box_height_pins - 1) is the number of grid spaces needed for pins
+    # e.g., 4 pins per side = 3 grid spaces
     box_height_grids = max(min_height_grids, (box_height_pins - 1) if box_height_pins > 0 else 0)
     box_height = (box_height_grids * GRID_SPACING) + GRID_SPACING # Total height
     
-    # Coordinates for the box
     top = (box_height / 2.0)
     bottom = -top
     left = -BOX_WIDTH / 2.0
     right = BOX_WIDTH / 2.0
     
-    # **NEW**: Store geometry to return
     geometry = {
         'box_top': top,
         'box_left': left
     }
     
-    # Coordinates for pins
     pin_x_left = -BOX_WIDTH / 2.0 - PIN_LENGTH
     pin_x_right = BOX_WIDTH / 2.0 + PIN_LENGTH
     
-    # --- 2. Add Graphics Block (e.g., _0_1 for unit 1) ---
-    unit_tag = f" (unit {unit_number})" if is_multi_unit else ""
-    graphics_lines.append(f'    (symbol "{symbol_name_prefix}_0_{unit_number}"{unit_tag}')
-    graphics_lines.append(f'      (rectangle (start {left:.2f} {top:.2f}) (end {right:.2f} {bottom:.2f})')
-    graphics_lines.append('        (stroke (width 0.254) (type default)) (fill (type background))')
-    graphics_lines.append('      )')
-    graphics_lines.append('    )') # Close (symbol ... _0_X)
+    # --- 2. Build the combined (symbol ..._X_1 ...) block ---
     
-    # --- 3. Add Pins Block (e.g., _1_1 for unit 1) ---
-    # Pins are wrapped in their own (symbol ..._1_X ...) block
-    pin_lines.append(f'    (symbol "{symbol_name_prefix}_1_{unit_number}"{unit_tag}')
+    # Start the child symbol block (KiCad convention is [name]_[unit]_[style])
+    # This generates ..._1_1, ..._2_1, etc.
+    unit_lines.append(f'    (symbol "{symbol_name_prefix}_{unit_number}_1"')
     
+    # Add Graphics (Rectangle)
+    unit_lines.append(f'      (rectangle (start {left:.2f} {top:.2f}) (end {right:.2f} {bottom:.2f})')
+    unit_lines.append('        (stroke (width 0.254) (type default)) (fill (type background))')
+    unit_lines.append('      )')
+    
+    # --- 3. Add Pins ---
     pin_index = 0
-    # Calculate starting Y position
     start_y_left = (left_pin_count - 1) * GRID_SPACING / 2.0
     start_y_right = (right_pin_count - 1) * GRID_SPACING / 2.0
 
@@ -150,10 +150,10 @@ def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, 
         y_pos = start_y_left - (i * GRID_SPACING)
         pin_type = "power_in" if pin_name.upper() in power_names_upper else "passive"
         
-        pin_lines.append(f'      (pin {pin_type} line (at {pin_x_left:.2f} {y_pos:.2f} 0) (length {PIN_LENGTH})')
-        pin_lines.append(f'        (name "{pin_name}" (effects (font (size 1.27 1.27))))')
-        pin_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
-        pin_lines.append('      )')
+        unit_lines.append(f'      (pin {pin_type} line (at {pin_x_left:.2f} {y_pos:.2f} 0) (length {PIN_LENGTH})')
+        unit_lines.append(f'        (name "{pin_name}" (effects (font (size 1.27 1.27))))')
+        unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
+        unit_lines.append('      )')
 
     # Add Right Pins
     for i in range(right_pin_count):
@@ -162,49 +162,47 @@ def _build_one_unit(symbol_name_prefix: str, unit_number: int, pins_list: list, 
         y_pos = start_y_right - (i * GRID_SPACING)
         pin_type = "power_in" if pin_name.upper() in power_names_upper else "passive"
         
-        pin_lines.append(f'      (pin {pin_type} line (at {pin_x_right:.2f} {y_pos:.2f} 180) (length {PIN_LENGTH})')
-        pin_lines.append(f'        (name "{pin_name}" (effects (font (size 1.27 1.27))))')
-        pin_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
-        pin_lines.append('      )')
+        unit_lines.append(f'      (pin {pin_type} line (at {pin_x_right:.2f} {y_pos:.2f} 180) (length {PIN_LENGTH})')
+        unit_lines.append(f'        (name "{pin_name}" (effects (font (size 1.27 1.27))))')
+        unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
+        unit_lines.append('      )')
     
-    pin_lines.append('    )') # Close (symbol ... _1_X)
+    # Close the child symbol block
+    unit_lines.append('    )') 
         
-    return ('\n'.join(graphics_lines), '\n'.join(pin_lines), geometry)
+    return ('\n'.join(unit_lines), geometry)
 
 
-def _generate_dynamic_ic_units(symbol_name: str, pin_csv: str, power_names: list) -> (str, str, bool, dict):
+def _generate_dynamic_symbol_blocks(symbol_name: str, pin_csv: str, power_names: list) -> (str, dict):
     """
-    Parses a pin CSV and generates KiCad unit blocks for main and power pins.
-    Returns a tuple: (all_graphics_blocks, all_pin_blocks, has_part_b_boolean, unit_1_geometry_dict)
-    """
+    Parses a pin CSV and generates KiCad symbol blocks for main and power pins.
     
-    # --- *** BUG FIX *** ---
-    # The problematic 'if not pin_csv:' block was removed.
-    # The logic below is robust and handles an empty pin_csv
-    # (which results in main_pins = [] and power_pins = [])
-    # correctly, flowing into the "if not pins_for_part_a..."
-    # block as intended.
+    Returns a tuple: (all_unit_blocks_string, unit_1_geometry_dict)
+    """
     
     # 1. Prepare lists
     main_pins = []
     power_pins = []
-    # Convert power_names to uppercase for case-insensitive compare
     power_names_upper = [name.upper() for name in power_names]
 
     # 2. Parse and Sort Pins
     all_pin_names = [name.strip() for name in pin_csv.split(',') if name.strip()]
     
-    for i, pin_name in enumerate(all_pin_names):
-        pin_number = str(i + 1)
+    # We now assign pin numbers *sequentially* as we parse
+    current_pin_number = 1
+    
+    for pin_name in all_pin_names:
+        pin_number = str(current_pin_number)
         pin_data = (pin_number, pin_name) # Store as (number, name)
 
         if pin_name.upper() in power_names_upper:
             power_pins.append(pin_data)
         else:
             main_pins.append(pin_data)
+        
+        current_pin_number += 1 # Increment for every pin
             
     # 3. Decide on unit structure
-    # Create Part B *only* if there are both main pins AND power pins.
     has_part_b = len(main_pins) > 0 and len(power_pins) > 0
 
     pins_for_part_a = []
@@ -218,32 +216,24 @@ def _generate_dynamic_ic_units(symbol_name: str, pin_csv: str, power_names: list
         pins_for_part_a = main_pins + power_pins
         
     # 4. Build the final string
-    all_graphics_strings = []
-    all_pin_strings = []
-    
-    # **NEW**: Store geometry for unit 1
+    all_unit_blocks = []
     geo_a = {}
 
-    # 5. Generate Part A (Main Pins or All Pins)
+    # 5. Generate Part A (Unit 1)
     if not pins_for_part_a and not pins_for_part_b:
-         # This block will now be correctly entered if pin_csv was empty
-         graphics_a, pins_a, geo_a = _build_one_unit(symbol_name, 1, [], power_names_upper, has_part_b)
-         all_graphics_strings.append(graphics_a)
-         all_pin_strings.append(pins_a)
+         unit_a_str, geo_a = _build_symbol_child_block(symbol_name, 1, [], power_names_upper)
+         all_unit_blocks.append(unit_a_str)
     else:
-        graphics_a, pins_a, geo_a = _build_one_unit(symbol_name, 1, pins_for_part_a, power_names_upper, has_part_b)
-        all_graphics_strings.append(graphics_a)
-        all_pin_strings.append(pins_a)
+        unit_a_str, geo_a = _build_symbol_child_block(symbol_name, 1, pins_for_part_a, power_names_upper)
+        all_unit_blocks.append(unit_a_str)
 
-    # 6. Generate Part B (Power Pins) - ONLY if it makes sense
+    # 6. Generate Part B (Unit 2) - ONLY if it makes sense
     if has_part_b:
-        # We don't need the geometry for part B
-        graphics_b, pins_b, _ = _build_one_unit(symbol_name, 2, pins_for_part_b, power_names_upper, has_part_b)
-        all_graphics_strings.append(graphics_b)
-        all_pin_strings.append(pins_b)
+        unit_b_str, _ = _build_symbol_child_block(symbol_name, 2, pins_for_part_b, power_names_upper)
+        all_unit_blocks.append(unit_b_str)
 
-    # 7. Return the combined string, the flag, and Unit 1's geometry
-    return ('\n'.join(all_graphics_strings), '\n'.join(all_pin_strings), has_part_b, geo_a)
+    # 7. Return the combined string and Unit 1's geometry
+    return ('\n'.join(all_unit_blocks), geo_a)
 
 
 def generate_symbol(part: Part, template: dict) -> str:
@@ -288,38 +278,31 @@ def generate_symbol(part: Part, template: dict) -> str:
         pin_csv_string = get_value_from_part(part, "Pin Description")
         
         # 3. Generate the KiCad text for all units (A, B, etc.)
-        (dynamic_graphics_str, dynamic_pins_str, has_part_b, unit_1_geo) = _generate_dynamic_ic_units(
+        (dynamic_symbol_blocks_str, unit_1_geo) = _generate_dynamic_symbol_blocks(
             symbol_name,
             pin_csv_string,
             power_names_list
         )
         
-        # --- *** NEW DYNAMIC POSITIONS *** ---
+        # --- Dynamic Property Positions (from previous request) ---
         box_left = unit_1_geo.get('box_left', 0)
         box_top = unit_1_geo.get('box_top', 3.81)
-        box_bottom = -box_top # The Y-coordinate of the bottom edge
+        box_bottom = -box_top 
 
-        # Reference: 50mil down from 100mil above top-left
         ref_x = box_left
-        ref_y = box_top + 1.27  # (box_top + 2.54) - 1.27
+        ref_y = box_top + 1.27  
 
-        # Manufacturer Partnumber: 50mil below bottom-left
         mpn_x = box_left
         mpn_y = box_bottom - 1.27 
         
-        # Description: 100mil below Manufacturer Partnumber (150mil total below bottom-left)
         desc_x = box_left
-        desc_y = mpn_y - 2.54 # 100mil (2.54mm) below mpn_y
+        desc_y = mpn_y - 2.54 
         
         
         # 4. Get base symbol options
         symbol_options = template.get("symbol_options", "")
         
-        # 5. Add multi-unit definitions if Part B was created
-        if has_part_b:
-            symbol_options += ' (all_units_locked yes) (unit_name "A" (inner_sym 0 0)) (unit_name "B" (inner_sym 0 0))'
-
-        # 6. Create the main (symbol ...) definition
+        # 5. Create the main (symbol ...) definition
         symbol_lines.append(
             f'    (symbol "{symbol_name}" {symbol_options} (in_bom yes) (on_board yes)'
         )
@@ -327,80 +310,62 @@ def generate_symbol(part: Part, template: dict) -> str:
         # 7. Generate property strings using templates
         for prop_name, prop_value in all_properties.items():
             
-            # Get the template string for font extraction
             prop_template_str = template.get('property_templates', {}).get(prop_name, '')
-            
-            # Try to find font size from template, default to 1.27
             font_size_match = re.search(r'\(size\s+([\d\.]+)\s+([\d\.]+)\)', prop_template_str)
             font_size_str = f"(size {font_size_match.group(1)} {font_size_match.group(2)})" if font_size_match else "(size 1.27 1.27)"
 
             
             if prop_name == "Reference":
-                # --- DYNAMIC PLACEMENT FOR REFERENCE ---
                 prop_line = f'(property "Reference" "{prop_value}" (at {ref_x:.2f} {ref_y:.2f} 0) (effects (font {font_size_str}) (justify left)) )'
                 symbol_lines.append(f'      {prop_line}')
 
-            # --- *** MODIFIED LINE *** ---
             elif prop_name == "Manufacturer Partnumber":
-                # --- **NEW** DYNAMIC PLACEMENT FOR MPN ---
                 prop_line = f'(property "Manufacturer Partnumber" "{prop_value}" (at {mpn_x:.2f} {mpn_y:.2f} 0) (effects (font {font_size_str}) (justify left)) )'
                 symbol_lines.append(f'      {prop_line}')
 
             elif prop_name == "Description":
-                # --- DYNAMIC PLACEMENT FOR DESCRIPTION ---
                 prop_line = f'(property "Description" "{prop_value}" (at {desc_x:.2f} {desc_y:.2f} 0) (effects (font {font_size_str}) (justify left)) )'
                 symbol_lines.append(f'      {prop_line}')
                 
             else:
-                # --- ORIGINAL LOGIC FOR ALL OTHER PROPERTIES (e.g., Value, Footprint) ---
+                # Use the template for all other properties (Value, Footprint, etc.)
                 prop_template = template.get('property_templates', {}).get(prop_name)
                 if prop_template:
-                    # Replace tabs/newlines from YAML multi-line strings
                     clean_template = " ".join(prop_template.split())
                     prop_line = clean_template.replace('{VALUE}', prop_value)
                     symbol_lines.append(f'      {prop_line}')
                 else:
-                    # Added the missing final closing parenthesis
                     symbol_lines.append(f'      (property "{prop_name}" "{prop_value}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )')
 
-        # 8. Add the generated graphics/pins for all units
-        if dynamic_graphics_str:
-            symbol_lines.append(f'  {dynamic_graphics_str}') # Add the graphics blocks
-        if dynamic_pins_str:
-            symbol_lines.append(f'  {dynamic_pins_str}') # Add the pin blocks
+        # 8. Add the generated child symbol blocks
+        if dynamic_symbol_blocks_str:
+            symbol_lines.append(f'  {dynamic_symbol_blocks_str}') 
 
     elif template.get("symbol_template"):
         # --- STATIC "symbol_template" GENERATOR (Original Logic) ---
         
-        # 1. Create the main (symbol ...) definition
         symbol_lines.append(
             f'    (symbol "{symbol_name}" {template.get("symbol_options", "")} (in_bom yes) (on_board yes)'
         )
         
-        # 2. Generate property strings
         for prop_name, prop_value in all_properties.items():
             prop_template = template.get('property_templates', {}).get(prop_name)
             if prop_template:
-                # Replace tabs/newlines from YAML multi-line strings
                 clean_template = " ".join(prop_template.split())
                 prop_line = clean_template.replace('{VALUE}', prop_value)
                 symbol_lines.append(f'      {prop_line}')
             else:
-                # Added the missing final closing parenthesis
                 symbol_lines.append(f'      (property "{prop_name}" "{prop_value}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )')
 
-        # 3. Add the static symbol graphics and pins
         raw_template = template.get("symbol_template", "")
         
         match = re.search(r'\(symbol\s+"(.*?)(?:_\d+_\d+)"', raw_template)
         if match:
             original_prefix = match.group(1)
             processed_template = raw_template.replace(original_prefix, symbol_name)
-            # Add indentation
             indented_template = '\n'.join([f'    {line}' for line in processed_template.splitlines() if line.strip()])
             symbol_lines.append(indented_template)
         else:
-            # Fallback for templates that might not follow the standard naming
             indented_template = '\n'.join([f'    {line}' for line in raw_template.splitlines() if line.strip()])
             symbol_lines.append(indented_template)
             
@@ -445,7 +410,6 @@ def main():
     # Organize parts by category
     parts_by_category = {}
     for part in parts:
-        # Use the full_path for more specific category matching if available
         category_name = part.category.get('full_path', part.category.get('name')) if part.category else 'Uncategorized'
         if category_name not in parts_by_category:
             parts_by_category[category_name] = []
@@ -454,32 +418,23 @@ def main():
     # Create output directory if it doesn't exist
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # --- *** NEW LOGIC *** ---
-    # Iterate through each fetched PART CATEGORY first
     for api_category, parts_in_category in parts_by_category.items():
         
         found_template = None
-        # Now, search the templates to find one that applies to this category
         for template_name, template_data in templates.items():
             template_categories = template_data.get('applies_to_categories', [])
             
             for template_cat_name in template_categories:
-                # Check if the API category ENDS WITH the one from the template list
-                # This allows matching "Electronics -> ICs -> Logic" with just "Logic"
                 if api_category.strip().lower().endswith(template_cat_name.strip().lower()):
                     found_template = template_data
                     break
             if found_template:
-                break # Found a template, stop searching
+                break 
 
-        # If no template claims this category, skip it
         if not found_template:
             print(f"Info: No template found with a matching 'applies_to_categories' entry for '{api_category}'. Skipping.")
             continue
             
-        # --- Found a template, proceed as before ---
-        
-        # Use the last part of the category path for the filename.
         library_name = api_category.split(' → ')[-1].replace(' ', '_').replace('/', '_')
         output_path = os.path.join(OUTPUT_DIR, f"{library_name}.kicad_sym")
         
@@ -489,7 +444,6 @@ def main():
             f.write('(kicad_symbol_lib (version 20211014) (generator partdb_linker)\n')
             for part in parts_in_category:
                 try:
-                    # Use the found_template to generate the symbol
                     symbol_str = generate_symbol(part, found_template)
                     f.write(symbol_str + '\n')
                 except Exception as e:
