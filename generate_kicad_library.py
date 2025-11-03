@@ -329,18 +329,30 @@ def _generate_dynamic_connector_block(symbol_name_prefix: str, part: Part) -> (s
         unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
         unit_lines.append('      )')
         
-        # --- *** MODIFIED: Gender graphic *** ---
+        # --- *** MODIFIED: Gender graphic (Total length 1.905) *** ---
         if gender == "male":
+            # Total line length is 1.905
             gx_start = left + 0.635
-            gx_end = left + 1.905
+            gx_end = left + (0.635 + 1.905) # left + 2.54
             unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
+        
         elif gender == "female":
-            gx_start = left + 0.635
-            gx_end = left + 1.27
-            arc_mid_x = left + 1.905
+            # Total graphic length is 1.905
             radius = 0.635
-            unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
-            unit_lines.append(f'      (arc (start {gx_end:.2f} {y_pos + radius:.2f}) (mid {arc_mid_x:.2f} {y_pos:.2f}) (end {gx_end:.2f} {y_pos - radius:.2f}) {stroke_style})')
+            line_length = 1.27 # (1.905 - 0.635)
+            
+            # Arc base is at the end of the graphic
+            arc_base = left + (0.635 + 1.905) # left + 2.54
+            # Arc mid is one radius behind the base
+            arc_mid = arc_base - radius     # left + 1.905
+            
+            # Line starts at the box edge
+            line_start = left + 0.635
+            # Line ENDS where the arc's bulge starts (at arc_mid)
+            line_end = arc_mid 
+            
+            unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
+            unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {line_end:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
 
     # Add Right Pins
     for i in range(right_pin_count):
@@ -354,19 +366,26 @@ def _generate_dynamic_connector_block(symbol_name_prefix: str, part: Part) -> (s
         unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
         unit_lines.append('      )')
         
-        # --- *** MODIFIED: Gender graphic *** ---
+        # --- *** MODIFIED: Right Side (Line + Outward Arc) Length 1.905 *** ---
         if gender == "male":
+            # Total line length is 1.905
             gx_start = right - 0.635
-            gx_end = right - 1.905
+            gx_end = right - (0.635 + 1.905) # right - 2.54
             unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
+
         elif gender == "female":
-            gx_start = right - 0.635
-            gx_end = right - 1.27
-            arc_mid_x = right - 1.905
+            # Total graphic length 1.905 (Line 1.27 + Arc 0.635)
             radius = 0.635
-            unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
-            unit_lines.append(f'      (arc (start {gx_end:.2f} {y_pos + radius:.2f}) (mid {arc_mid_x:.2f} {y_pos:.2f}) (end {gx_end:.2f} {y_pos - radius:.2f}) {stroke_style})')
             
+            # Line is at the box edge
+            line_start = right - 0.635
+            line_end = right - (0.635 + 1.27) # right - 1.905
+            
+            # Arc base is at the end
+            arc_base = line_end - radius # right - 2.54
+            
+            unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
+            unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {line_end:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
     # Close the child symbol block
     unit_lines.append('    )') 
         
