@@ -342,7 +342,7 @@ def _generate_dynamic_connector_block(symbol_name_prefix: str, part: Part) -> (s
             line_length = 1.27 # (1.905 - 0.635)
             
             # Arc base is at the end of the graphic
-            arc_base = left + (0.635 + 1.905) # left + 2.54
+            arc_base = left + (0.635 + 1.27) # left + 2.54
             # Arc mid is one radius behind the base
             arc_mid = arc_base - radius     # left + 1.905
             
@@ -379,13 +379,22 @@ def _generate_dynamic_connector_block(symbol_name_prefix: str, part: Part) -> (s
             
             # Line is at the box edge
             line_start = right - 0.635
-            line_end = right - (0.635 + 1.27) # right - 1.905
             
-            # Arc base is at the end
-            arc_base = line_end - radius # right - 2.54
+            # The line ends where the arc 'start'/'end' points are
+            # This is the 'base' of the arc
+            arc_base_x = right - 1.27 # right - 1.905
             
-            unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
-            unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {line_end:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
+            # The 'mid' point of the arc is at the very end (most inward)
+            arc_mid_x = arc_base_x # right - 2.54
+            
+            arc_start_x = arc_mid_x - radius
+            # Draw the line from the box to the base of the arc
+            unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {arc_base_x:.2f} {y_pos:.2f})) {stroke_style})')
+            
+            # Draw the arc:
+            # Start/End X is at arc_base_x
+            # Mid X is at arc_mid_x
+            unit_lines.append(f'      (arc (start {arc_start_x:.2f} {y_pos + radius:.2f}) (mid {arc_mid_x:.2f} {y_pos:.2f}) (end {arc_start_x:.2f} {y_pos - radius:.2f}) {stroke_style})')
     # Close the child symbol block
     unit_lines.append('    )') 
         
