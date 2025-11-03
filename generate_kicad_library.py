@@ -272,7 +272,12 @@ def _generate_dynamic_connector_block(symbol_name_prefix: str, part: Part) -> (s
     # --- 2. Calculate Geometry ---
     GRID_SPACING = 2.54  # 100mil
     PIN_LENGTH = 2.54
-    BOX_WIDTH = 7.62     # 300mil
+    
+    # --- *** MODIFIED: Adjust box width for single-row headers *** ---
+    if num_rows == 1:
+        BOX_WIDTH = 3.81 # 150mil
+    else:
+        BOX_WIDTH = 7.62     # 300mil
     
     left_pin_count = 0
     right_pin_count = 0
@@ -311,90 +316,133 @@ def _generate_dynamic_connector_block(symbol_name_prefix: str, part: Part) -> (s
     unit_lines.append('      )')
     
     # --- 4. Add Pins and Gender Graphics ---
-    current_pin_number = 1
     start_y_left = (left_pin_count - 1) * GRID_SPACING / 2.0
     start_y_right = (right_pin_count - 1) * GRID_SPACING / 2.0
     
     stroke_style = '(stroke (width 0.2) (type default)) (fill (type none))'
-    
-    # Add Left Pins
-    for i in range(left_pin_count):
-        pin_number = str(current_pin_number)
-        current_pin_number += 1
-        y_pos = start_y_left - (i * GRID_SPACING)
-        
-        unit_lines.append(f'      (pin passive line (at {pin_x_left:.2f} {y_pos:.2f} 0) (length {PIN_LENGTH})')
-        # --- *** MODIFIED: Added (hide yes) to name *** ---
-        unit_lines.append(f'        (name "{pin_number}" (effects (font (size 1.27 1.27)) (hide yes)))')
-        unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
-        unit_lines.append('      )')
-        
-        # --- *** MODIFIED: Gender graphic (Total length 1.905) *** ---
-        if gender == "male":
-            # Total line length is 1.905
-            gx_start = left + 0.635
-            gx_end = left + (0.635 + 1.905) # left + 2.54
-            unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
-        
-        elif gender == "female":
-            # Total graphic length is 1.905
-            radius = 0.635
-            line_length = 1.27 # (1.905 - 0.635)
-            
-            # Arc base is at the end of the graphic
-            arc_base = left + (0.635 + 1.27) # left + 2.54
-            # Arc mid is one radius behind the base
-            arc_mid = arc_base - radius     # left + 1.905
-            
-            # Line starts at the box edge
-            line_start = left + 0.635
-            # Line ENDS where the arc's bulge starts (at arc_mid)
-            line_end = arc_mid 
-            
-            unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
-            unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {line_end:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
 
-    # Add Right Pins
-    for i in range(right_pin_count):
-        pin_number = str(current_pin_number)
-        current_pin_number += 1
-        y_pos = start_y_right - (i * GRID_SPACING)
-        
-        unit_lines.append(f'      (pin passive line (at {pin_x_right:.2f} {y_pos:.2f} 180) (length {PIN_LENGTH})')
-        # --- *** MODIFIED: Added (hide yes) to name *** ---
-        unit_lines.append(f'        (name "{pin_number}" (effects (font (size 1.27 1.27)) (hide yes)))')
-        unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
-        unit_lines.append('      )')
-        
-        # --- *** MODIFIED: Right Side (Line + Outward Arc) Length 1.905 *** ---
-        if gender == "male":
-            # Total line length is 1.905
-            gx_start = right - 0.635
-            gx_end = right - (0.635 + 1.905) # right - 2.54
-            unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
+    # --- Fetch Pin Annotation and select numbering style ---
+    pin_annotation_str = get_value_from_part(part, "Pin Annotation").lower()
+    is_line_annotation = (num_rows > 1 and pin_annotation_str == "line")
 
-        elif gender == "female":
-            # Total graphic length 1.905 (Line 1.27 + Arc 0.635)
-            radius = 0.635
+    if is_line_annotation:
+        # --- "Line" Annotation (e.g., Left: 1, 3; Right: 2, 4) ---
+        current_pin_number = 1
+        
+        for i in range(pins_per_row): # Iterate row by row
+            # --- Add Left Pin (1, 3, 5...) ---
+            pin_number_left = str(current_pin_number)
+            current_pin_number += 1
+            y_pos = start_y_left - (i * GRID_SPACING)
             
-            # Line is at the box edge
-            line_start = right - 0.635
+            unit_lines.append(f'      (pin passive line (at {pin_x_left:.2f} {y_pos:.2f} 0) (length {PIN_LENGTH})')
+            unit_lines.append(f'        (name "{pin_number_left}" (effects (font (size 1.27 1.27)) (hide yes)))')
+            unit_lines.append(f'        (number "{pin_number_left}" (effects (font (size 1.27 1.27))))')
+            unit_lines.append('      )')
             
-            # The line ends where the arc 'start'/'end' points are
-            # This is the 'base' of the arc
-            arc_base_x = right - 1.27 # right - 1.905
+            # Left Gender Graphic
+            if gender == "male":
+                gx_start = left + 0.635
+                gx_end = left + (0.635 + 1.905) # left + 2.54
+                unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
             
-            # The 'mid' point of the arc is at the very end (most inward)
-            arc_mid_x = arc_base_x # right - 2.54
+            elif gender == "female":
+                radius = 0.635
+                arc_base = left + (0.635 + 1.27 + radius) # left + 2.54
+                arc_mid = arc_base - radius     # left + 1.905
+                line_start = left + 0.635
+                line_end = arc_mid 
+                
+                unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
+                unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {line_end:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
             
-            arc_start_x = arc_mid_x - radius
-            # Draw the line from the box to the base of the arc
-            unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {arc_base_x:.2f} {y_pos:.2f})) {stroke_style})')
+            # --- Add Right Pin (2, 4, 6...) ---
+            if right_pin_count > 0:
+                pin_number_right = str(current_pin_number)
+                current_pin_number += 1
+                y_pos = start_y_right - (i * GRID_SPACING)
+
+                unit_lines.append(f'      (pin passive line (at {pin_x_right:.2f} {y_pos:.2f} 180) (length {PIN_LENGTH})')
+                unit_lines.append(f'        (name "{pin_number_right}" (effects (font (size 1.27 1.27)) (hide yes)))')
+                unit_lines.append(f'        (number "{pin_number_right}" (effects (font (size 1.27 1.27))))')
+                unit_lines.append('      )')
+                
+                # Right Gender Graphic
+                if gender == "male":
+                    gx_start = right - 0.635
+                    gx_end = right - (0.635 + 1.905) # right - 2.54
+                    unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
+
+                elif gender == "female":
+                    # Symmetrical to left side
+                    radius = 0.635
+                    line_start = right - 0.635
+                    arc_mid = right - (0.635 + 1.27) # right - 1.905
+                    line_end = arc_mid
+                    arc_base = right - (0.635 + 1.27 + radius) # right - 2.54
+                    
+                    unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {arc_mid:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
+
+    else:
+        # --- "Row" Annotation (Default) or Single Row (e.g., Left: 1, 2; Right: 3, 4) ---
+        current_pin_number = 1
+        
+        # Add Left Pins
+        for i in range(left_pin_count):
+            pin_number = str(current_pin_number)
+            current_pin_number += 1
+            y_pos = start_y_left - (i * GRID_SPACING)
             
-            # Draw the arc:
-            # Start/End X is at arc_base_x
-            # Mid X is at arc_mid_x
-            unit_lines.append(f'      (arc (start {arc_start_x:.2f} {y_pos + radius:.2f}) (mid {arc_mid_x:.2f} {y_pos:.2f}) (end {arc_start_x:.2f} {y_pos - radius:.2f}) {stroke_style})')
+            unit_lines.append(f'      (pin passive line (at {pin_x_left:.2f} {y_pos:.2f} 0) (length {PIN_LENGTH})')
+            unit_lines.append(f'        (name "{pin_number}" (effects (font (size 1.27 1.27)) (hide yes)))')
+            unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
+            unit_lines.append('      )')
+            
+            # Left Gender Graphic
+            if gender == "male":
+                gx_start = left + 0.635
+                gx_end = left + (0.635 + 1.905) # left + 2.54
+                unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
+            
+            elif gender == "female":
+                radius = 0.635
+                arc_base = left + (0.635 + 1.27 + radius) # left + 2.54
+                arc_mid = arc_base - radius     # left + 1.905
+                line_start = left + 0.635
+                line_end = arc_mid 
+                
+                unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
+                unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {line_end:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
+
+        # Add Right Pins (This loop will be skipped if num_rows == 1)
+        for i in range(right_pin_count):
+            pin_number = str(current_pin_number)
+            current_pin_number += 1
+            y_pos = start_y_right - (i * GRID_SPACING)
+            
+            unit_lines.append(f'      (pin passive line (at {pin_x_right:.2f} {y_pos:.2f} 180) (length {PIN_LENGTH})')
+            unit_lines.append(f'        (name "{pin_number}" (effects (font (size 1.27 1.27)) (hide yes)))')
+            unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
+            unit_lines.append('      )')
+            
+            # Right Gender Graphic
+            if gender == "male":
+                gx_start = right - 0.635
+                gx_end = right - (0.635 + 1.905) # right - 2.54
+                unit_lines.append(f'      (polyline (pts (xy {gx_start:.2f} {y_pos:.2f}) (xy {gx_end:.2f} {y_pos:.2f})) {stroke_style})')
+
+            elif gender == "female":
+                # Symmetrical to left side
+                radius = 0.635
+                line_start = right - 0.635
+                arc_mid = right - (0.635 + 1.27) # right - 1.905
+                line_end = arc_mid
+                arc_base = right - (0.635 + 1.27 + radius) # right - 2.54
+                
+                unit_lines.append(f'      (polyline (pts (xy {line_start:.2f} {y_pos:.2f}) (xy {line_end:.2f} {y_pos:.2f})) {stroke_style})')
+                unit_lines.append(f'      (arc (start {arc_base:.2f} {y_pos + radius:.2f}) (mid {arc_mid:.2f} {y_pos:.2f}) (end {arc_base:.2f} {y_pos - radius:.2f}) {stroke_style})')
+
     # Close the child symbol block
     unit_lines.append('    )') 
         
@@ -478,7 +526,7 @@ def generate_symbol(part: Part, template: dict) -> str:
             indented_template = '\n'.join([f'    {line}' for line in processed_template.splitlines() if line.strip()])
             symbol_lines.append(indented_template)
         else:
-            indented_template = '\n'.join([f'    {line}' for line in raw_template.splitlines() if line.strip()])
+            indented_template = '\n'.join([f'    {line}'for line in raw_template.splitlines() if line.strip()])
             symbol_lines.append(indented_template)
             
     else:
