@@ -203,10 +203,10 @@ Dynamic_IC_Box_Generator:
   property_templates:
     # --- Standard fields (FIXED justify) ---
     # KiCad syntax is (justify horizontal vertical)
-    "Reference": '(property "Reference" "{VALUE}" (at 0 3.81 0) (effects (font (size 1.27 1.27)) (justify right) ) )'
-    "Value": '(property "Value" "{VALUE}" (at 0 -3.81 0) (effects (font (size 1.27 1.27)) (justify right) ) )'
-    "Footprint": '(property "Footprint" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
-    "Datasheet": '(property "Datasheet" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Reference": '(property "Reference" "{VALUE}" (at 0 3.81 0) (effects (font (face "Calibri") (size 1.27 1.27)) (justify right) ) )'
+    "Value": '(property "Value" "{VALUE}" (at 0 -3.81 0) (effects (font (face "Calibri") (size 1.27 1.27)) (justify right) ) )'
+    "Footprint": '(property "Footprint" "{VALUE}" (at 0 0 0) (effects (font (face "Calibri") (size 1.27 1.27)) (hide yes) ) )'
+    "Datasheet": '(property "Datasheet" "{VALUE}" (at 0 0 0) (effects (font (face "Calibri") (size 1.27 1.27)) (hide yes) ) )'
     
     # --- The most important field for this generator ---
     "Pin Description": '(property "Pin Description" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
@@ -236,3 +236,49 @@ Dynamic_IC_Box_Generator:
     - "AGND"
     - "DVDD"
     - "DGND"
+
+    # ===================================================================
+# --- TEMPLATE 4: Dynamic Connector Generator ---
+# ===================================================================
+Dynamic_Connector_Generator:
+
+  # This template will apply to ALL categories listed here
+  applies_to_categories:
+    - "Pin Headers"
+    - "PCB to PCB"
+    # Add any other connector category from Part-DB here
+
+  field_mapping:
+    "Reference": "'J?'" # 'J' is standard for Connectors
+    "Value": "value"
+    "Footprint": "footprint.name"
+    "Datasheet": "manufacturer_product_url"
+
+  symbol_options: '(pin_numbers) (pin_names (hide yes) (offset 0.508)) (exclude_from_sim no)'
+
+  property_templates:
+    # --- Standard fields ---
+    # NOTE: Reference, Description, and Manufacturer Partnumber
+    # will be dynamically placed by the script, but their
+    # font/size info is still pulled from here.
+    "Reference": '(property "Reference" "{VALUE}" (at 0 3.81 0) (effects (font (size 1.27 1.27)) (justify left) ) )'
+    "Value": '(property "Value" "{VALUE}" (at 0 -3.81 0) (effects (font (size 1.27 1.27)) (justify right) ) )'
+    "Footprint": '(property "Footprint" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Datasheet": '(property "Datasheet" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    
+    # --- Key fields for this generator (will be read by script) ---
+    "Number of Rows": '(property "Number of Rows" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Pins per Row": '(property "Pins per Row" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Gender": '(property "Gender" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    
+    # --- Other common fields ---
+    "Description": '(property "Description" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Manufacturer": '(property "Manufacturer" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "Manufacturer Partnumber": '(property "Manufacturer Partnumber" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "ki_keywords": '(property "ki_keywords" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+    "ki_fp_filters": '(property "ki_fp_filters" "{VALUE}" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes) ) )'
+
+  # --- Generator configuration ---
+  
+  # Use the new dynamic connector generator
+  symbol_generator: "Connector"
