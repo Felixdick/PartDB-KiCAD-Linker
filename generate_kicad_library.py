@@ -506,9 +506,9 @@ class KiCadLibraryGenerator:
                 unit_lines.append(f'        (number "{pin_number_left}" (effects (font (size 1.27 1.27))))')
                 unit_lines.append('      )')
                 if gender == "male":
-                    unit_lines.append(f'      (polyline (pts (xy {left+0.635:.2f} {y_pos:.2f}) (xy {left+2.54:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (polyline (pts (xy {left:.2f} {y_pos:.2f}) (xy {left+2.54:.2f} {y_pos:.2f})) {stroke_style})')
                 elif gender == "female":
-                    unit_lines.append(f'      (polyline (pts (xy {left+0.635:.2f} {y_pos:.2f}) (xy {left+1.905:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (polyline (pts (xy {left:.2f} {y_pos:.2f}) (xy {left+1.905:.2f} {y_pos:.2f})) {stroke_style})')
                     unit_lines.append(f'      (arc (start {left+2.54:.2f} {y_pos+0.635:.2f}) (mid {left+1.905:.2f} {y_pos:.2f}) (end {left+2.54:.2f} {y_pos-0.635:.2f}) {stroke_style})')
                 if right_pin_count > 0:
                     pin_number_right = str(current_pin_number); current_pin_number += 1
@@ -518,10 +518,11 @@ class KiCadLibraryGenerator:
                     unit_lines.append(f'        (number "{pin_number_right}" (effects (font (size 1.27 1.27))))')
                     unit_lines.append('      )')
                     if gender == "male":
-                        unit_lines.append(f'      (polyline (pts (xy {right-0.635:.2f} {y_pos:.2f}) (xy {right-2.54:.2f} {y_pos:.2f})) {stroke_style})')
+                        unit_lines.append(f'      (polyline (pts (xy {right:.2f} {y_pos:.2f}) (xy {right-2.54:.2f} {y_pos:.2f})) {stroke_style})')
                     elif gender == "female":
-                        unit_lines.append(f'      (polyline (pts (xy {right-0.635:.2f} {y_pos:.2f}) (xy {right-1.905:.2f} {y_pos:.2f})) {stroke_style})')
-                        unit_lines.append(f'      (arc (start {right-2.54:.2f} {y_pos+0.635:.2f}) (mid {right-1.905:.2f} {y_pos:.2f}) (end {right-2.54:.2f} {y_pos-0.635:.2f}) {stroke_style})')
+                        unit_lines.append(f'      (polyline (pts (xy {right:.2f} {y_pos:.2f}) (xy {right-1.905:.2f} {y_pos:.2f})) {stroke_style})')
+                        unit_lines.append(f'      (arc (start {right-2.54:.2f} {y_pos-0.635:.2f}) (mid {right-1.905:.2f} {y_pos:.2f}) (end {right-2.54:.2f} {y_pos+0.635:.2f}) {stroke_style})')
+                        print("do")
         else:
             current_pin_number = 1
             for i in range(left_pin_count):
@@ -532,9 +533,9 @@ class KiCadLibraryGenerator:
                 unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
                 unit_lines.append('      )')
                 if gender == "male":
-                    unit_lines.append(f'      (polyline (pts (xy {left+0.635:.2f} {y_pos:.2f}) (xy {left+2.54:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (polyline (pts (xy {left:.2f} {y_pos:.2f}) (xy {left+2.54:.2f} {y_pos:.2f})) {stroke_style})')
                 elif gender == "female":
-                    unit_lines.append(f'      (polyline (pts (xy {left+0.635:.2f} {y_pos:.2f}) (xy {left+1.905:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (polyline (pts (xy {left:.2f} {y_pos:.2f}) (xy {left+1.905:.2f} {y_pos:.2f})) {stroke_style})')
                     unit_lines.append(f'      (arc (start {left+2.54:.2f} {y_pos+0.635:.2f}) (mid {left+1.905:.2f} {y_pos:.2f}) (end {left+2.54:.2f} {y_pos-0.635:.2f}) {stroke_style})')
             for i in range(right_pin_count):
                 pin_number = str(current_pin_number); current_pin_number += 1
@@ -544,10 +545,11 @@ class KiCadLibraryGenerator:
                 unit_lines.append(f'        (number "{pin_number}" (effects (font (size 1.27 1.27))))')
                 unit_lines.append('      )')
                 if gender == "male":
-                    unit_lines.append(f'      (polyline (pts (xy {right-0.635:.2f} {y_pos:.2f}) (xy {right-2.54:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (polyline (pts (xy {right:.2f} {y_pos:.2f}) (xy {right-2.54:.2f} {y_pos:.2f})) {stroke_style})')
                 elif gender == "female":
-                    unit_lines.append(f'      (polyline (pts (xy {right-0.635:.2f} {y_pos:.2f}) (xy {right-1.905:.2f} {y_pos:.2f})) {stroke_style})')
-                    unit_lines.append(f'      (arc (start {right-2.54:.2f} {y_pos+0.635:.2f}) (mid {right-1.905:.2f} {y_pos:.2f}) (end {right-2.54:.2f} {y_pos-0.635:.2f}) {stroke_style})')
+                    unit_lines.append(f'      (polyline (pts (xy {right:.2f} {y_pos:.2f}) (xy {right-1.905:.2f} {y_pos:.2f})) {stroke_style})')
+                    unit_lines.append(f'      (arc (start {right-2.54:.2f} {y_pos-0.635:.2f}) (mid {right-1.905:.2f} {y_pos:.2f}) (end {right-2.54:.2f} {y_pos+0.635:.2f}) {stroke_style})')
+                    print("di")
         
         unit_lines.append('    )') 
         return ('\n'.join(unit_lines), geometry)
