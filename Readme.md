@@ -115,6 +115,56 @@ python kicad_template_extractor.py --library "path/to/your/library.kicad_sym" --
 
 This will output a complete template structure, including graphics, pins, and properties, which you can then customize.
 
+## Dynamic Symbol Generators
+
+For common component types like ICs and connectors, the tool includes dynamic generators that create symbols based on PartDB parameters, removing the need for a graphical `symbol_template`. To use them, set the `symbol_generator` key in your template.
+
+### IC Generator (`IC_Box`)
+
+This generator creates a standard rectangular IC symbol.
+
+**Template Setup:**
+```yaml
+My_IC_Template:
+  applies_to_categories:
+    - "ICs"
+  symbol_generator: IC_Box
+  # Optional: Define pin names that should be on a separate power unit
+  power_pin_names:
+    - VCC
+    - GND
+  # ... field_mapping etc.
+```
+
+**Required PartDB Parameters:**
+
+*   **`Pin Description`**: A comma-separated string of all pin names in order, starting from pin 1. For example: `MOSI,MISO,SCLK,CS,GND,VCC`.
+
+The generator will automatically number the pins and arrange them on the left and right sides of the symbol. If `power_pin_names` are defined in the template, those pins will be grouped onto a separate unit (Unit 2) for better schematic organization.
+
+### Connector Generator (`Connector`)
+
+This generator creates a connector symbol with configurable rows, pin counts, and gender graphics.
+
+**Template Setup:**
+```yaml
+My_Connector_Template:
+  applies_to_categories:
+    - "Connectors"
+  symbol_generator: Connector
+  # ... field_mapping etc.
+```
+
+**Required PartDB Parameters:**
+
+The generator determines the connector's shape from the following parameters. It's robust and will try to calculate the geometry from the information available.
+
+*   **`Number of Rows`**: (Integer) The number of pin rows (e.g., `1` or `2`). Defaults to `1`.
+*   **`Pins per Row`**: (Integer) The number of pins in each row.
+*   **`Number of Pins`** or **`Pin Count`**: (Integer) The total number of pins. This is used to calculate `Pins per Row` if it's not explicitly provided.
+*   **`Gender`**: (String) Set to `Male` or `Female` to draw the appropriate pin graphics inside the symbol body.
+*   **`Pin Annotation`**: (String) If set to `line` for multi-row connectors, pins will be numbered sequentially row by row (e.g., 1, 2, 3, 4 for a 2x2 connector). Otherwise, they are numbered column by column (e.g., 1, 3, 2, 4).
+
 ## Dependencies
 
 *   [requests](https://pypi.org/project/requests/)
