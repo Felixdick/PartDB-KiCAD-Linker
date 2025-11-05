@@ -8,6 +8,11 @@ import configparser
 import requests
 import copy
 
+# Prerequisites:
+# - Python 3.6+
+# - PyYAML: pip install pyyaml
+# - requests: pip install requests
+
 # Import the Part-DB API client script
 try:
     from partdb_api_client import fetch_parts_from_api, Part
