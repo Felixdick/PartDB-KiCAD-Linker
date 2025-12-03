@@ -1,0 +1,704 @@
+global_parameters:
+  - name: FIT_Rate
+    unit:
+    symbol:
+  - name: Op_Temp_Min
+    unit: Celsius
+    symbol: °C
+  - name: Op_Temp_Max
+    unit: Celsius
+    symbol: °C
+  - name: RoHS_Compliant
+    unit:
+    symbol:
+  - name: REACH_Compliant
+    unit:
+    symbol:
+  - name: UL_Rating
+    unit:
+    symbol:
+  - name: Datasheet_Link
+    unit:
+    symbol:
+
+categories:
+  - name: Resistors
+    parameters:
+      - name: Resistance_Ohms
+        unit: Ohm
+        symbol: Ω
+      - name: Tolerance_%
+        unit: Percent
+        symbol: "%"
+      - name: Power_W
+        unit: Watt
+        symbol: W
+      - name: Voltage_Rated_V
+        unit: Volt
+        symbol: V
+    children:
+      - name: Thick Film
+      - name: Thin Film
+        parameters:
+          - name: TCR_ppm
+            unit: ppm/°C
+            symbol:
+      - name: Current Sense
+        parameters:
+          - name: TCR_ppm
+            unit: ppm/°C
+            symbol:
+          - name: Pulse_Rating_J
+            unit: Joules
+            symbol: J
+      - name: Arrays/Networks
+        parameters:
+          - name: Element_Count
+            unit:
+            symbol:
+      - name: Potentiometers
+        parameters:
+          - name: Adjustment_Type
+            unit:
+            symbol:
+          - name: Turns
+            unit:
+            symbol:
+
+  - name: Capacitors
+    parameters:
+      - name: Capacitance_F
+        unit: Farad
+        symbol: F
+      - name: Voltage_Rated_V
+        unit: Volt
+        symbol: V
+      - name: Tolerance_%
+        unit: Percent
+        symbol: "%"
+    children:
+      - name: MLCC
+        parameters:
+          - name: Dielectric
+            unit:
+            symbol:
+          - name: DC_Bias_Loss_%
+            unit: Percent
+            symbol: "%"
+      - name: Elko
+        parameters:
+          - name: ESR_Ohms
+            unit: Ohm
+            symbol: Ω
+          - name: Ripple_Current_mA
+            unit: Milliampere
+            symbol: mA
+          - name: Lifetime_Hours
+            unit: Hours
+            symbol: h
+      - name: Tantalum/Polymer
+        parameters:
+          - name: ESR_Ohms
+            unit: Ohm
+            symbol: Ω
+          - name: Case_Code
+            unit:
+            symbol:
+      - name: Film
+        parameters:
+          - name: Dielectric_Material
+            unit:
+            symbol:
+          - name: dv/dt
+            unit:
+            symbol:
+      - name: Supercapacitors
+        parameters:
+          - name: ESR_Ohms
+            unit: Ohm
+            symbol: Ω
+
+  - name: Inductors & Magnetics
+    parameters:
+      - name: Inductance_H
+        unit: Henry
+        symbol: H
+      - name: DCR_Ohms
+        unit: Ohm
+        symbol: Ω
+      - name: I_Sat_A
+        unit: Ampere
+        symbol: A
+      - name: I_Rated_A
+        unit: Ampere
+        symbol: A
+      - name: Tolerance_%
+        unit: Percent
+        symbol: "%"
+    children:
+      - name: Power Inductors
+        parameters:
+          - name: Shielding
+            unit:
+            symbol:
+      - name: RF Inductors
+        parameters:
+          - name: Q_Factor
+            unit:
+            symbol:
+          - name: SRF_MHz
+            unit: Megahertz
+            symbol: MHz
+      - name: Ferrite Beads
+        parameters:
+          - name: Impedance_100MHz_Ohms
+            unit: Ohm
+            symbol: Ω
+      - name: Common Mode Chokes
+        parameters:
+          - name: Impedance_Common_Mode
+            unit: Ohm
+            symbol: Ω
+          - name: Leakage_Inductance
+            unit: Henry
+            symbol: H
+      - name: Transformers
+        parameters:
+          - name: Turns_Ratio
+            unit:
+            symbol:
+          - name: Isolation_Voltage_V
+            unit: Volt
+            symbol: V
+
+  - name: Discrete Semiconductors
+    parameters:
+      - name: Theta_JC
+        unit: Kelvin/Watt
+        symbol: K/W
+      - name: Tj_Max
+        unit: Celsius
+        symbol: °C
+    children:
+      - name: Diodes
+        children:
+          - name: Rectifier/Switching
+            parameters:
+              - name: V_Reverse_V
+                unit: Volt
+                symbol: V
+              - name: I_Forward_A
+                unit: Ampere
+                symbol: A
+              - name: V_Forward_V
+                unit: Volt
+                symbol: V
+              - name: Trr_ns
+                unit: Nanoseconds
+                symbol: ns
+          - name: Zener
+            parameters:
+              - name: V_Zener_V
+                unit: Volt
+                symbol: V
+              - name: Power_W
+                unit: Watt
+                symbol: W
+              - name: Impedance_Zzt
+                unit: Ohm
+                symbol: Ω
+          - name: Schottky
+            parameters:
+              - name: V_Reverse_V
+                unit: Volt
+                symbol: V
+              - name: I_Forward_A
+                unit: Ampere
+                symbol: A
+              - name: V_Forward_V
+                unit: Volt
+                symbol: V
+          - name: TVS
+            parameters:
+              - name: V_StandOff_V
+                unit: Volt
+                symbol: V
+              - name: V_Clamp_V
+                unit: Volt
+                symbol: V
+              - name: P_Peak_Pulse_W
+                unit: Watt
+                symbol: W
+              - name: Uni_Bi_Directional
+                unit:
+                symbol:
+          - name: LEDs
+            parameters:
+              - name: Color
+                unit:
+                symbol:
+              - name: Wavelength_nm
+                unit: Nanometer
+                symbol: nm
+              - name: Luminous_Intensity_mcd
+                unit: Millicandela
+                symbol: mcd
+              - name: I_Test_mA
+                unit: Milliampere
+                symbol: mA
+      - name: Transistors
+        children:
+          - name: FETs
+            parameters:
+              - name: Ch_Type
+                unit:
+                symbol:
+              - name: SC_Material
+                unit:
+                symbol:
+              - name: V_DSS_V
+                unit: Volt
+                symbol: V
+              - name: I_D_A
+                unit: Ampere
+                symbol: A
+              - name: R_DS_on_Ohms
+                unit: Ohm
+                symbol: Ω
+              - name: V_GS_th_V
+                unit: Volt
+                symbol: V
+              - name: Qg_nC
+                unit: Nanocoulomb
+                symbol: nC
+              - name: Theta_JA
+                unit: Kelvin/Watt
+                symbol: K/W
+          - name: BJTs
+            parameters:
+              - name: Type
+                unit:
+                symbol:
+              - name: V_CE_V
+                unit: Volt
+                symbol: V
+              - name: I_C_A
+                unit: Ampere
+                symbol: A
+              - name: hFE_Gain
+                unit:
+                symbol:
+              - name: fT_MHz
+                unit: Megahertz
+                symbol: MHz
+          - name: IGBTs
+            parameters:
+              - name: V_CES_V
+                unit: Volt
+                symbol: V
+              - name: I_C_A
+                unit: Ampere
+                symbol: A
+              - name: V_CE_sat_V
+                unit: Volt
+                symbol: V
+              - name: Switching_Energy_mJ
+                unit: Millijoule
+                symbol: mJ
+
+  - name: Integrated Circuits (ICs)
+    parameters:
+      - name: Supply_V_Min
+        unit: Volt
+        symbol: V
+      - name: Supply_V_Max
+        unit: Volt
+        symbol: V
+      - name: I_Quiescent_uA
+        unit: Microampere
+        symbol: µA
+      - name: Package_Type
+        unit:
+        symbol:
+      - name: Theta_JC
+        unit: Kelvin/Watt
+        symbol: K/W
+      - name: Tj_Max
+        unit: Celsius
+        symbol: °C
+    children:
+      - name: Power Management
+        children:
+          - name: Linear / LDO
+            parameters:
+              - name: V_Out_V
+                unit: Volt
+                symbol: V
+              - name: I_Out_Max_A
+                unit: Ampere
+                symbol: A
+              - name: Dropout_V
+                unit: Volt
+                symbol: V
+              - name: PSRR_dB
+                unit: Decibel
+                symbol: dB
+          - name: Switching DC/DC
+            parameters:
+              - name: Topology
+                unit:
+                symbol:
+              - name: V_Out_Range
+                unit: Volt
+                symbol: V
+              - name: I_Out_Max_A
+                unit: Ampere
+                symbol: A
+              - name: Freq_Switch_kHz
+                unit: Kilohertz
+                symbol: kHz
+          - name: PMIC
+            parameters:
+              - name: Output_Count
+                unit:
+                symbol:
+              - name: Interface
+                unit:
+                symbol:
+          - name: BMS / Battery
+            parameters:
+              - name: Cell_Count
+                unit:
+                symbol:
+              - name: Protection_Features
+                unit:
+                symbol:
+          - name: Voltage Reference
+            parameters:
+              - name: V_Ref_V
+                unit: Volt
+                symbol: V
+              - name: Accuracy_%
+                unit: Percent
+                symbol: "%"
+              - name: Drift_ppm
+                unit: ppm
+                symbol: ppm
+      - name: Microcontrollers & Processing
+        children:
+          - name: MCU
+            parameters:
+              - name: Core
+                unit:
+                symbol:
+              - name: Speed_MHz
+                unit: Megahertz
+                symbol: MHz
+              - name: Flash_Size_kB
+                unit: Kilobyte
+                symbol: kB
+              - name: RAM_Size_kB
+                unit: Kilobyte
+                symbol: kB
+              - name: GPIO_Count
+                unit:
+                symbol:
+          - name: FPGA
+            parameters:
+              - name: Logic_Cells
+                unit:
+                symbol:
+              - name: Block_RAM_bits
+                unit: Bits
+                symbol: b
+              - name: DSP_Slices
+                unit:
+                symbol:
+      - name: Analog & Mixed Signal
+        children:
+          - name: OpAmps
+            parameters:
+              - name: Bandwidth_MHz
+                unit: Megahertz
+                symbol: MHz
+              - name: Slew_Rate_V/us
+                unit: Volts/Microsecond
+                symbol: V/µs
+              - name: V_Offset_uV
+                unit: Microvolt
+                symbol: µV
+              - name: Rail_to_Rail
+                unit:
+                symbol:
+          - name: Comparators
+            parameters:
+              - name: Prop_Delay_ns
+                unit: Nanoseconds
+                symbol: ns
+              - name: Hysteresis_mV
+                unit: Millivolt
+                symbol: mV
+          - name: ADC
+            parameters:
+              - name: ADC_Type
+                unit:
+                symbol:
+              - name: Resolution_Bits
+                unit: Bits
+                symbol: b
+              - name: Sample_Rate_kSPS
+                unit: Kilosamples/second
+                symbol: kSPS
+              - name: Channels
+                unit:
+                symbol:
+              - name: Interface
+                unit:
+                symbol:
+          - name: DAC
+            parameters:
+              - name: DAC_Type
+                unit:
+                symbol:
+              - name: Resolution_Bits
+                unit: Bits
+                symbol: b
+              - name: Channels
+                unit:
+                symbol:
+              - name: Settling_Time_us
+                unit: Microsecond
+                symbol: µs
+      - name: Logic
+        children:
+          - name: Gates/Inverters
+            parameters:
+              - name: Logic_Level_V
+                unit: Volt
+                symbol: V
+              - name: Prop_Delay_ns
+                unit: Nanoseconds
+                symbol: ns
+          - name: Level Shifters
+            parameters:
+              - name: Direction
+                unit:
+                symbol:
+              - name: Data_Rate_Mbps
+                unit: Megabits/second
+                symbol: Mbps
+          - name: Buffers/Drivers
+            parameters:
+              - name: Output_Drive_mA
+                unit: Milliampere
+                symbol: mA
+              - name: Channels
+                unit:
+                symbol:
+              - name: Driver_Type
+                unit:
+                symbol:
+      - name: Interface
+        children:
+          - name: Transceivers
+            parameters:
+              - name: Protocol
+                unit:
+                symbol:
+              - name: Data_Rate
+                unit:
+                symbol:
+              - name: Isolation_V
+                unit: Volt
+                symbol: V
+          - name: Switches/Mux
+            parameters:
+              - name: Configuration
+                unit:
+                symbol:
+              - name: On_Resistance_Ohms
+                unit: Ohm
+                symbol: Ω
+      - name: Memory
+        children:
+          - name: Flash
+            parameters:
+              - name: Size_Mbit
+                unit: Megabit
+                symbol: Mb
+              - name: Interface
+                unit:
+                symbol:
+          - name: EEPROM
+            parameters:
+              - name: Size_kbit
+                unit: Kilobit
+                symbol: kb
+              - name: Interface
+                unit:
+                symbol:
+          - name: RAM
+            parameters:
+              - name: Type
+                unit:
+                symbol:
+              - name: Size_Mbit
+                unit: Megabit
+                symbol: Mb
+      - name: Sensors
+        children:
+          - name: Environmental
+            parameters:
+              - name: Measurand
+                unit:
+                symbol:
+              - name: Range
+                unit:
+                symbol:
+              - name: Accuracy
+                unit:
+                symbol:
+              - name: Response_Time
+                unit:
+                symbol:
+          - name: Motion / IMU
+            parameters:
+              - name: Type
+                unit:
+                symbol:
+              - name: Axes
+                unit:
+                symbol:
+              - name: Sensitivity_LSB_g
+                unit:
+                symbol: LSB/g
+              - name: Noise_Density
+                unit:
+                symbol:
+          - name: Optical
+            parameters:
+              - name: Type
+                unit:
+                symbol:
+              - name: Wavelength_nm
+                unit: Nanometer
+                symbol: nm
+              - name: Range_mm
+                unit: Millimeter
+                symbol: mm
+          - name: Magnetic / Hall
+            parameters:
+              - name: Type
+                unit:
+                symbol:
+              - name: Operating_Point_mT
+                unit: Millitesla
+                symbol: mT
+              - name: Output
+                unit:
+                symbol:
+          - name: Audio (MEMS Mic)
+            parameters:
+              - name: SNR_dB
+                unit: Decibel
+                symbol: dB
+              - name: Sensitivity_dB
+                unit: Decibel
+                symbol: dB
+          - name: Image Sensors
+            parameters:
+              - name: Resolution_MP
+                unit: Megapixel
+                symbol: MP
+              - name: Optical_Format
+                unit:
+                symbol:
+              - name: Shutter_Type
+                unit:
+                symbol:
+          - name: Current Sensors
+            parameters:
+              - name: Sensing_Method
+                unit:
+                symbol:
+              - name: Range_A
+                unit: Ampere
+                symbol: A
+              - name: Sensitivity_mV/A
+                unit: Millivolts/Ampere
+                symbol: mV/A
+              - name: Isolation_V
+                unit: Volt
+                symbol: V
+              - name: Bandwidth_kHz
+                unit: Kilohertz
+                symbol: kHz
+
+  - name: Connectors
+    parameters:
+      - name: Pitch_mm
+        unit: Millimeter
+        symbol: mm
+      - name: Pin_Count
+        unit:
+        symbol:
+      - name: Mounting
+        unit:
+        symbol:
+      - name: Current_Rating_A
+        unit: Ampere
+        symbol: A
+      - name: Gender
+        unit:
+        symbol:
+      - name: Orientation
+        unit:
+        symbol:
+      - name: Number_Rows
+        unit:
+        symbol:
+      - name: Pin_Annotation
+        unit:
+        symbol:
+    children:
+      - name: Board-to-Board
+        parameters:
+          - name: Series
+            unit:
+            symbol:
+      - name: Wire-to-Board
+        parameters:
+          - name: Series
+            unit:
+            symbol:
+      - name: I/O Connectors
+        parameters:
+          - name: Type
+            unit:
+            symbol:
+          - name: Standard_Version
+            unit:
+            symbol:
+      - name: Terminal Blocks
+        parameters:
+          - name: Wire_Gauge_AWG
+            unit:
+            symbol: AWG
+          - name: Termination
+            unit:
+            symbol:
+
+  - name: Mechanical
+    parameters:
+      - name: Material
+        unit:
+        symbol:
+      - name: Finish
+        unit:
+        symbol:
+      - name: Thread_Size
+        unit:
+        symbol:
+      - name: Length_mm
+        unit: Millimeter
+        symbol: mm

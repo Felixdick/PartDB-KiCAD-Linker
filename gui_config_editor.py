@@ -9,12 +9,14 @@ import threading
 # Import the new generator class
 # This assumes generate_kicad_library.py is in the same directory
 try:
-    from generate_kicad_library import KiCadLibraryGenerator, GeneratorException
+    from generate_kicad_library import KiCadLibraryGenerator
+    from linker_exceptions import GeneratorException
+    from partdb_sync_script import PartDBSyncer, parse_yaml_categories
 except ImportError:
     messagebox.showerror(
         "Error", 
-        "Could not find 'generate_kicad_library.py'.\n"
-        "Please make sure it is in the same directory as this GUI."
+        "Could not find required scripts.\n"
+        "Please make sure 'generate_kicad_library.py' and 'partdb_sync_script.py' are in the same directory."
     )
     sys.exit()
 
@@ -293,6 +295,9 @@ class ConfigEditor(tk.Tk):
         self.run_button = ttk.Button(button_frame, text="Run Generator...", command=self.run_generator)
         self.run_button.pack(side="right", padx=5)
         
+        self.sync_button = ttk.Button(button_frame, text="Sync Categories", command=self.run_sync)
+        self.sync_button.pack(side="right", padx=5)
+
         self.save_button = ttk.Button(button_frame, text="Save Config", command=self.save_config)
         self.save_button.pack(side="right", padx=5)
         
@@ -389,6 +394,34 @@ class ConfigEditor(tk.Tk):
         self.run_button.config(state="normal")
         self.save_button.config(state="normal")
         self.close_button.config(state="normal")
+        self.sync_button.config(state="normal")
+
+    def run_sync(self):
+        """Runs the category synchronization in a thread."""
+        self.status_label.config(text="Syncing categories... Please wait.")
+        self.sync_button.config(state="disabled")
+        self.run_button.config(state="disabled")
+        
+        api_url = self.api_url_var.get()
+        api_token = self.api_token_var.get()
+        
+        threading.Thread(target=self._run_sync_thread, args=(api_url, api_token), daemon=True).start()
+
+    def _run_sync_thread(self, api_url, api_token):
+        try:
+            tree, global_params = parse_yaml_categories('categories.yaml')
+            syncer = PartDBSyncer(api_url, api_token)
+            syncer.fetch_existing_categories()
+            syncer.touched_ids = set()
+            syncer.sync_tree(tree, inherited_params=global_params)
+            syncer.prune_categories(syncer.touched_ids)
+            self.after(0, lambda: messagebox.showinfo("Sync Complete", "Category synchronization finished successfully."))
+            self.after(0, lambda: self.status_label.config(text="Sync complete."))
+        except Exception as e:
+            self.after(0, lambda: messagebox.showerror("Sync Error", f"Sync failed:\n{e}"))
+            self.after(0, lambda: self.status_label.config(text="Sync failed."))
+        finally:
+            self.after(0, self.reset_ui)
 
 if __name__ == "__main__":
     app = ConfigEditor()

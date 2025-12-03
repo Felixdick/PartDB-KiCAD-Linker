@@ -1,0 +1,6 @@
+{
+  "title": "An error occurred",
+  "detail": "Requested format \"application/json\" is not supported. Supported MIME types are \"application/vnd.openapi+json\".",
+  "status": 406,
+  "type": "/errors/406"
+}
