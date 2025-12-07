@@ -5,7 +5,7 @@ Static_Resistor_Template:
   # This template will be used for any Part-DB category that
   # ends with "Thick Film Resistors".
   applies_to_categories:
-    - "Thick Film Resistors"
+    - "Thick Film"
     # - "Metal Film Resistors" # You could add more here
 
   field_mapping:
@@ -93,7 +93,7 @@ Static_Resistor_Template:
 # ===================================================================
 Static_Capacitor_Template:
   applies_to_categories:
-    - "MLCCs"
+    - "MLCC"
 
   field_mapping:
     "Reference": "'C?'"

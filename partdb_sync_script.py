@@ -230,7 +230,10 @@ class PartDBSyncer:
                 self.sync_tree(children, cat_id, current_params)
             else:
                 # It's a leaf node (in our tree structure), ensure dummy part
+                # It's a leaf node (in our tree structure), ensure dummy part
                 self.ensure_dummy_part(cat_id, current_params)
+                # Also sync real parts in this category
+                self.sync_real_parts(cat_id, current_params)
 
     def get_all_category_ids_from_tree(self, tree: List[dict]) -> set:
         """Helper to collect all category IDs defined in the YAML."""
@@ -304,7 +307,41 @@ class PartDBSyncer:
         except requests.RequestException as e:
             self.log(f"Error deleting category '{name}': {e}")
 
-    def sync_parameters(self, part_id: int, part_iri: str, desired_params: List[dict]):
+    def sync_real_parts(self, category_id: int, parameters: List[dict]):
+        """Syncs parameters for all non-dummy parts in a category."""
+        try:
+            # Fetch all parts in category
+            # Pagination might be needed if many parts
+            page = 1
+            while True:
+                resp = requests.get(
+                    f"{self.api_url}/api/parts",
+                    headers=self.headers,
+                    params={"category": category_id, "page": page, "itemsPerPage": 100}
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                members = data.get('hydra:member', [])
+                
+                if not members:
+                    break
+                    
+                for part in members:
+                    if part['name'] == "DUMMY":
+                        continue
+                    
+                    # Sync with safe_delete=True
+                    self.sync_parameters(part['id'], f"/api/parts/{part['id']}", parameters, safe_delete=True)
+                
+                if 'hydra:view' in data and 'hydra:next' in data['hydra:view']:
+                    page += 1
+                else:
+                    break
+                    
+        except requests.RequestException as e:
+            self.log(f"Error syncing real parts in category {category_id}: {e}")
+
+    def sync_parameters(self, part_id: int, part_iri: str, desired_params: List[dict], safe_delete: bool = False):
         """Syncs native PartDB parameters for a part."""
         if not desired_params:
             desired_params = []
@@ -387,6 +424,34 @@ class PartDBSyncer:
         # 3. Delete Obsolete Parameters
         for name, ep in existing_map.items():
             if name not in desired_names:
+                if safe_delete:
+                    # Check if parameter has a value
+                    # The 'value' field in parameter object might be 'value' or 'valueNumeric' depending on type
+                    # Let's check the fetched details
+                    # Note: The /api/parameters/{id} response should contain the value.
+                    # Based on API docs/experience, value is usually in 'value' or 'valueNumeric'.
+                    # Let's check both or just 'value' if it's the string representation.
+                    # If it's not empty, skip delete.
+                    
+                    # We need to check the actual value.
+                    # The 'ep' object comes from /api/parameters/{id}
+                    # Debugging showed 'value_text' is used.
+                    val = ep.get('value')
+                    val_text = ep.get('value_text')
+                    val_num = ep.get('valueNumeric')
+                    val_num_snake = ep.get('value_numeric')
+                    
+                    has_value = (
+                        (val is not None and str(val).strip() != "") or 
+                        (val_text is not None and str(val_text).strip() != "") or 
+                        (val_num is not None) or
+                        (val_num_snake is not None)
+                    )
+                    
+                    if has_value:
+                        # self.log(f"Skipping deletion of parameter '{name}' (ID: {ep['id']}) from part {part_id}: Has value")
+                        continue
+
                 self.log(f"Deleting obsolete parameter '{name}' from part {part_id}...")
                 try:
                     requests.delete(f"{self.api_url}/api/parameters/{ep['id']}", headers=self.headers).raise_for_status()

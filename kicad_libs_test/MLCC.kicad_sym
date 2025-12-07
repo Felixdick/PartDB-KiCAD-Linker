@@ -1,0 +1,85 @@
+(kicad_symbol_lib (version 20211014) (generator partdb_linker_gui)
+  (symbol "CGA2B3X7R1E104K050BB" (pin_numbers (hide yes) ) (pin_names (offset 0.254) ) (exclude_from_sim no) (in_bom yes) (on_board yes)
+    (property "Reference" "C?" (at 2.794 2.032 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )
+    (property "Value" "" (at 2.794 0.254 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )
+    (property "Footprint" "C_0402" (at 0.9652 -3.81 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )
+    (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )
+    (property "Capacitance_F" "100n" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Compliance_Standard" "AEC-Q200" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "DC_Bias_Loss" "-15% to -20%" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Datasheet_Link" "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/catalog/mlcc_automotive_general_en.pdf" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Dielectric" "X7R" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "FIT_Rate" "-" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Op_Temp_Max" "125" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Op_Temp_Min" "-55" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "REACH_Compliant" "true" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "RoHS_Compliant" "true" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Tolerance" "10%" (at 2.794 -3.302 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )
+    (property "UL_Rating" "-" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Voltage_Rated_V" "25V" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+  (symbol "CGA2B3X7R1E104K050BB_0_1"
+    (polyline
+    (pts
+    (xy -2.032 0.762) (xy 2.032 0.762)
+    )
+    (stroke
+    (width 0.508)
+    (type default)
+    )
+    (fill
+    (type none)
+    )
+    )
+    (polyline
+    (pts
+    (xy -2.032 -0.762) (xy 2.032 -0.762)
+    )
+    (stroke
+    (width 0.508)
+    (type default)
+    )
+    (fill
+    (type none)
+    )
+    )
+    )
+  (symbol "CGA2B3X7R1E104K050BB_1_1"
+    (pin passive line
+    (at 0 3.81 270)
+    (length 2.794)
+    (name "~"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    (number "1"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    )
+    (pin passive line
+    (at 0 -3.81 90)
+    (length 2.794)
+    (name "~"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    (number "2"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    )
+    )
+  )
+)

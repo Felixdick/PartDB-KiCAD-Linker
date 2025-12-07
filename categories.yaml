@@ -14,6 +14,9 @@ global_parameters:
   - name: REACH_Compliant
     unit:
     symbol:
+  - name: Compliance_Standard
+    unit:
+    symbol:
   - name: UL_Rating
     unit:
     symbol:
@@ -27,9 +30,9 @@ categories:
       - name: Resistance_Ohms
         unit: Ohm
         symbol: Ω
-      - name: Tolerance_%
-        unit: Percent
-        symbol: "%"
+      - name: Tolerance
+        unit:  
+        symbol:  
       - name: Power_W
         unit: Watt
         symbol: W
@@ -73,18 +76,18 @@ categories:
       - name: Voltage_Rated_V
         unit: Volt
         symbol: V
-      - name: Tolerance_%
-        unit: Percent
-        symbol: "%"
+      - name: Tolerance
+        unit:  
+        symbol:  
     children:
       - name: MLCC
         parameters:
           - name: Dielectric
             unit:
             symbol:
-          - name: DC_Bias_Loss_%
-            unit: Percent
-            symbol: "%"
+          - name: DC_Bias_Loss
+            unit:  
+            symbol:  
       - name: Elko
         parameters:
           - name: ESR_Ohms
@@ -132,9 +135,9 @@ categories:
       - name: I_Rated_A
         unit: Ampere
         symbol: A
-      - name: Tolerance_%
-        unit: Percent
-        symbol: "%"
+      - name: Tolerance
+        unit:  
+        symbol:  
     children:
       - name: Power Inductors
         parameters:
@@ -378,9 +381,9 @@ categories:
               - name: V_Ref_V
                 unit: Volt
                 symbol: V
-              - name: Accuracy_%
-                unit: Percent
-                symbol: "%"
+              - name: Accuracy
+                unit:  
+                symbol:  
               - name: Drift_ppm
                 unit: ppm
                 symbol: ppm

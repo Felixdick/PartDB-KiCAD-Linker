@@ -1,0 +1,71 @@
+(kicad_symbol_lib (version 20211014) (generator partdb_linker_gui)
+  (symbol "CRCW040210K0FKED" (pin_numbers (hide yes) ) (pin_names (offset 0) ) (exclude_from_sim no) (in_bom yes) (on_board yes)
+    (property "Reference" "R?" (at 1.778 2.032 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )
+    (property "Value" "" (at 1.778 0.254 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )
+    (property "Footprint" "R_0402" (at -1.778 0 90) (effects (font (size 1.27 1.27) ) (hide yes) ) )
+    (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes) ) )
+    (property "Compliance_Standard" "AEC-Q200" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Datasheet_Link" "https://www.vishay.com/docs/20035/dcrcwe3.pdf" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "FIT_Rate" "-" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Op_Temp_Max" "125" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Op_Temp_Min" "-55" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Power_W" "0.063" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "REACH_Compliant" "true" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Resistance_Ohms" "10k" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "RoHS_Compliant" "yes" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Tolerance" "1%" (at 1.778 -1.524 0) (effects (font (face "Calibri") (size 1.27 1.27) ) (justify left) ) )
+    (property "UL_Rating" "-" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+    (property "Voltage_Rated_V" "75" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)) )
+  (symbol "CRCW040210K0FKED_0_1"
+    (rectangle
+    (start -1.016 2.54)
+    (end 1.016 -2.54)
+    (stroke
+    (width 0.254)
+    (type default)
+    )
+    (fill
+    (type none)
+    )
+    )
+    )
+  (symbol "CRCW040210K0FKED_1_1"
+    (pin passive line
+    (at 0 3.81 270)
+    (length 1.27)
+    (name "~"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    (number "1"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    )
+    (pin passive line
+    (at 0 -3.81 90)
+    (length 1.27)
+    (name "~"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    (number "2"
+    (effects
+    (font
+    (size 1.27 1.27)
+    )
+    )
+    )
+    )
+    )
+  )
+)

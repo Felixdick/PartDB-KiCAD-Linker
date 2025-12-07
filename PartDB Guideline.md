@@ -17,7 +17,7 @@
 
 - **Name:** **MUST be the MPN (Manufacturer Part Number).**
 - **Description:** Strict technical description.
-    - _Format passives:_ `[Category] [Values] [Tolerance] [Package]` (e.g., `RES 10k 1/10W 1% 0603`).
+    - _Format passives:_ `[Category] [Values] [Tolerance] [Package]` (e.g., ` 10k 1/10W 1% 0603`).
     - _Format actives:_ `[Category] [Features] [Package]` (e.g., `OpAmp Dual Channel Rail to Rail`).
 - **Category:** Select from the tree structure (defined in Section 4).
 - **Tags:** Not mandatory
@@ -69,7 +69,7 @@ Structure PartDB categories exactly as follows. Parameters listed are _in additi
 
 #### **1.0 Resistors**
 
-- **Shared Parameters:** `Resistance_Ohms`, `Tolerance_%`, `Power_W`, `Voltage_Rated_V`
+- **Shared Parameters:** `Resistance_Ohms`, `Tolerance`, `Power_W`, `Voltage_Rated_V`
     - **1.1 Thick Film**
     - **1.2 Thin Film**: -> Add `TCR_ppm`
     - **1.3 Current Sense**: -> Add `TCR_ppm`, `Pulse_Rating_J`
@@ -78,8 +78,8 @@ Structure PartDB categories exactly as follows. Parameters listed are _in additi
 
 #### **2.0 Capacitors**
 
-- **Shared Parameters:** `Capacitance_F`, `Voltage_Rated_V`, `Tolerance_%`
-    - **2.1 MLCC**: -> Add `Dielectric`, `DC_Bias_Loss_%`
+- **Shared Parameters:** `Capacitance_F`, `Voltage_Rated_V`, `Tolerance`
+    - **2.1 MLCC**: -> Add `Dielectric`, `DC_Bias_Loss` (at 1/2 rated voltage)
     - **2.2 Elko**: -> Add `ESR_Ohms`, `Ripple_Current_mA`, `Lifetime_Hours`
     - **2.3 Tantalum/Polymer**: -> Add `ESR_Ohms`, `Case_Code`
     - **2.4 Film**: -> Add `Dielectric_Material`, `dv/dt`
@@ -87,7 +87,7 @@ Structure PartDB categories exactly as follows. Parameters listed are _in additi
 
 #### **3.0 Inductors & Magnetics**
 
-- **Shared Parameters:** `Inductance_H`, `DCR_Ohms`, `I_Sat_A`, `I_Rated_A`, `Tolerance_%`
+- **Shared Parameters:** `Inductance_H`, `DCR_Ohms`, `I_Sat_A`, `I_Rated_A`, `Tolerance`
     - **3.1 Power Inductors**: -> Add `Shielding`
     - **3.2 RF Inductors**: -> Add `Q_Factor`, `SRF_MHz`
     - **3.3 Ferrite Beads**: -> Add `Impedance_100MHz_Ohms`
@@ -116,7 +116,7 @@ Structure PartDB categories exactly as follows. Parameters listed are _in additi
         - **5.1.2 Switching DC/DC**: `Topology`, `V_Out_Range`, `I_Out_Max_A`, `Freq_Switch_kHz`
         - **5.1.3 PMIC**: `Output_Count`, `Interface`
         - **5.1.4 BMS / Battery**: `Cell_Count`, `Protection_Features`
-        - **5.1.5 Voltage Reference**: `V_Ref_V`, `Accuracy_%`, `Drift_ppm`
+        - **5.1.5 Voltage Reference**: `V_Ref_V`, `Accuracy`, `Drift_ppm`
     - **5.2 Microcontrollers & Processing**
         - **5.2.1 MCU**: `Core`, `Speed_MHz`, `Flash_Size_kB`, `RAM_Size_kB`, `GPIO_Count`
         - **5.2.2 FPGA**: `Logic_Cells`, `Block_RAM_bits`, `DSP_Slices`
